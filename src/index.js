@@ -4,13 +4,31 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = __importDefault(require("express"));
+const cors_1 = __importDefault(require("cors"));
+const medias_json_1 = __importDefault(require("../resources/medias.json"));
+const medias = medias_json_1.default;
 const app = (0, express_1.default)();
-app.use(express_1.default.json());
 const PORT = 3000;
-app.get('/hola', (_req, res) => {
-    console.log("holiiiii");
-    res.send("sirve");
+const urlbaseMediaRoute = 'https://storagecdn.codev8.net';
+const urlbaseThumbnaialRoute = 'https://progressive.codev8.net';
+let corsOptions = {
+    origin: "*",
+    methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
+    preflightContinue: false,
+    optionsSuccessStatus: 204
+};
+app.use(express_1.default.json());
+app.use((0, cors_1.default)(corsOptions));
+app.get('/getmedias', (_req, res) => {
+    let newMedia;
+    const media2 = medias.map(media => (Object.assign(Object.assign({}, media), { thumbnail: Object.assign(Object.assign({}, media.thumbnail), { thumbnailroute: `${urlbaseThumbnaialRoute}/userdatanew/b4ab8f95-bc2b-4d88-8ff0-df4df19d206c/thumbnails/${media.thumbnail.filename}` }), mediaroute: `${urlbaseMediaRoute}/ondemand/b4ab8f95-bc2b-4d88-8ff0-df4df19d206c/${media.filedata.filename}` })));
+    newMedia = media2;
+    res.send(newMedia);
+});
+app.post('/addmedias', (req, res) => {
+    console.log(req.body);
+    res.send("llego");
 });
 app.listen(PORT, () => {
-    console.log("servidor en el port " + PORT);
+    console.log(`Server up on port: ${PORT}`);
 });
