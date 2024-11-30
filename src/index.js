@@ -6,12 +6,12 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = __importDefault(require("express"));
 const cors_1 = __importDefault(require("cors"));
 const medias_json_1 = __importDefault(require("../resources/medias.json"));
-const medias = medias_json_1.default;
+let medias = [...medias_json_1.default];
 const app = (0, express_1.default)();
 const PORT = 3000;
 const urlbaseMediaRoute = 'https://storagecdn.codev8.net';
 const urlbaseThumbnaialRoute = 'https://progressive.codev8.net';
-let corsOptions = {
+const corsOptions = {
     origin: "*",
     methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
     preflightContinue: false,
@@ -26,8 +26,13 @@ app.get('/getmedias', (_req, res) => {
     res.send(newMedia);
 });
 app.post('/addmedias', (req, res) => {
-    console.log(req.body);
-    res.send("llego");
+    const newMedia = req.body;
+    const lastId = medias[medias.length - 1].id;
+    const lastThumbnailid = medias[medias.length - 1].thumbnail.id;
+    newMedia.id = lastId + 1;
+    newMedia.thumbnail.id = lastThumbnailid + 1;
+    medias.push(newMedia);
+    res.status(201).send({ message: "Media added successfully", media: medias });
 });
 app.listen(PORT, () => {
     console.log(`Server up on port: ${PORT}`);

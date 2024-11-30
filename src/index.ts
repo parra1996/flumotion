@@ -6,13 +6,12 @@ import { newMediasType } from './types/medias';
 
 import mediasJson from '../resources/medias.json';
 
-const medias: mediasType = mediasJson;
+let medias: mediasType = [...mediasJson];
 const app = express();
 const PORT: Number = 3000;
 const urlbaseMediaRoute: String = 'https://storagecdn.codev8.net';
 const urlbaseThumbnaialRoute: String = 'https://progressive.codev8.net';
-
-let corsOptions = {
+const corsOptions = {
     origin: "*",
     methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
     preflightContinue: false,
@@ -35,9 +34,16 @@ app.get('/getmedias', (_req, res: Response) => {
 })
 
 app.post('/addmedias', (req: Request, res: Response) => {
-    console.log(req)
+    const newMedia = req.body;
+    if (Object.keys(newMedia).length > 0) {
+        const lastId = medias[medias.length - 1].id;
+        const lastThumbnailid = medias[medias.length - 1].thumbnail.id;
+        newMedia.id = lastId + 1;
+        newMedia.thumbnail.id = lastThumbnailid + 1;
+        medias.push(newMedia);
 
-    res.send("llego")
+        res.status(201).send({ message: "Media added successfully", media: medias });
+    } else res.status(400).send({ message: "bas request, please try again" });
 })
 
 app.listen(PORT, () => {
